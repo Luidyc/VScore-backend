@@ -1,17 +1,12 @@
 package Lexus.Score.dev.Controller;
-
-import Lexus.Score.dev.Dto.DivergenciaDto;
 import Lexus.Score.dev.Dto.TransporteDto;
+import Lexus.Score.dev.Dto.TransporteDtoList;
 import Lexus.Score.dev.Entity.Transporte.Transporte;
 import Lexus.Score.dev.Service.Transporte.TransporteService;
-import jakarta.persistence.PostUpdate;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +45,20 @@ public class TransporteController {
         Optional<TransporteDto> transporteUpdated = transporteService.update(id,transporteRequest);
         if(transporteUpdated.isPresent()) { return ResponseEntity.ok().body(transporteUpdated.get()); }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/last")
+    public ResponseEntity<List<TransporteDtoList>> getTheLast() {
+        return ResponseEntity.ok(transporteService.getTheLast());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TransporteDto> deleteById(@Valid @PathVariable("id") Long id) {
+        boolean response = transporteService.deleteById(id);
+        if(response != true) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else {return ResponseEntity.ok().build();}
     }
 
 

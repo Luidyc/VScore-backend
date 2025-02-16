@@ -1,5 +1,6 @@
 package Lexus.Score.dev.Service.Transporte;
 import Lexus.Score.dev.Dto.TransporteDto;
+import Lexus.Score.dev.Dto.TransporteDtoList;
 import Lexus.Score.dev.Entity.Transporte.Transporte;
 import Lexus.Score.dev.Repository.TransporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,16 @@ public class TransporteService {
         transporte.setFotos(transporteRequest.fotos());
         transporteRepository.save(transporte);
         return Optional.of(transporte);
+    }
+
+    public List<TransporteDtoList> getTheLast() {
+        List<Transporte> transportes = transporteRepository.getTheLastList();
+        List<TransporteDtoList> response = new ArrayList();
+        for (Transporte transporte : transportes) {
+            TransporteDtoList newTransporte = new TransporteDtoList(transporte.getId(),transporte.getPlaca(),transporte.getMotorista());
+            response.add(newTransporte);
+        }
+        return response;
     }
 
     public List<TransporteDto> getAll() {
@@ -54,4 +65,12 @@ public class TransporteService {
         return Optional.of(transporteResponse);
     }
 
+    public boolean deleteById(Long id) {
+        Optional<Transporte> request = transporteRepository.findById(id);
+        if(request.isPresent()) {
+            transporteRepository.deleteById(id);
+            return true;
+        }
+        else { return false; }
+    }
 }
