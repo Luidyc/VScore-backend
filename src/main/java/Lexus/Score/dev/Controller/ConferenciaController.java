@@ -29,6 +29,15 @@ public class ConferenciaController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @PutMapping()
+    public ResponseEntity<Conferencia> update(@AuthenticationPrincipal UserDetails userDetails,
+                                              @RequestBody ConferenciaDto request){
+        String username = userDetails.getUsername();
+        Optional<Conferencia> response = conferenciaService.update(username,request);
+        if (response.isPresent()) return new ResponseEntity<>(response.get(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @GetMapping()
     public ResponseEntity<List<Conferencia>> getAll() {
         return ResponseEntity.ok(conferenciaService.getAll());

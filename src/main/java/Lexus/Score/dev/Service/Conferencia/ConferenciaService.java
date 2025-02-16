@@ -22,24 +22,40 @@ public class ConferenciaService {
     NotaRepository notaRepository;
 
     public Optional<Conferencia> create(String username,ConferenciaDto conferenciaDto) {
-       if(conferenciaDto!=null) {
-           Conferencia newConferencia = new Conferencia();
-           newConferencia.setDataConfencia(LocalDateTime.now());
-           newConferencia.setConferente(username);
-           // Eu vou procurar pelo ID para cada nota recebida
-           for(Nota nota : conferenciaDto.notasFiscais()) {
-               Long id = nota.getId();
-               // Meu retorno do repository é opicional, pode ou não encontrar
-               Optional<Nota> searchNota = notaRepository.findById(id);
-               // Se encontrou uma nota
-               if (searchNota.isPresent()) {
-                   // Minha conferência vai adicionar a nota encontrada.
-                   newConferencia.getNotasFiscais().add(searchNota.get()); }
+        //Verificando a request
+        if(conferenciaDto!=null) {
+            //Chamo a função que verifica
+            Optional<Conferencia> created = getCreated(conferenciaDto);
+            //Faço validação        //Retorno existente
+           if(created!=null) {return created;}
+            Conferencia newConferencia = new Conferencia();
+            newConferencia.setDataConfencia(LocalDateTime.now());
+            newConferencia.setConferente(username);
+            // Eu vou procurar pelo ID para cada nota recebida
+            for(Nota nota : conferenciaDto.notasFiscais()) {
+                Long id = nota.getId();
+                // Meu retorno do repository é opcional, pode ou não encontrar
+                Optional<Nota> searchNota = notaRepository.findById(id);
+                // Se encontrou uma nota
+                if (searchNota.isPresent()) {
+                    // Minha conferência vai adicionar a nota encontrada.
+                    newConferencia.getNotasFiscais().add(searchNota.get());
+                }
+               }
+               conferenciaRepository.save(newConferencia);
+               return Optional.of(newConferencia);
            }
-           conferenciaRepository.save(newConferencia);
-           return Optional.of(newConferencia);
-       }
-       return Optional.empty();
+        return Optional.empty();
+    }
+
+    public Optional<Conferencia> getCreated(ConferenciaDto verify) {
+        for(Nota nota: verify.notasFiscais()) {
+            Optional<Conferencia> created = conferenciaRepository.findByNotaId(nota.getId());
+            if(false) {
+                return Optional.of(created.get());
+            }
+        }
+        return null;
     }
 
     public List<Conferencia> getAll() {
@@ -54,4 +70,16 @@ public class ConferenciaService {
         return Optional.empty();
     }
 
+    public Optional<Conferencia> update(String username, ConferenciaDto request) {
+        Optional<Conferencia> response = conferenciaRepository.findById(request.id());
+        if(response.isPresent()) {
+            response.get().setConferente(username);
+            response.get().setDataConfencia(LocalDateTime.now());
+            for(Nota nota : response.get().getNotasFiscais()) {
+                Long id = nota.getId();
+                //newNota = notaRepository.findById(id);
+            }
+        }
+        return Optional.empty();
+    }
 }

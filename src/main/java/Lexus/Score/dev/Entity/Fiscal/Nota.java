@@ -1,7 +1,9 @@
 package Lexus.Score.dev.Entity.Fiscal;
 
 
+import Lexus.Score.dev.Entity.Conferencia.Conferencia;
 import Lexus.Score.dev.Entity.Transporte.Transporte;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +33,11 @@ public class Nota {
 
     @OneToMany(mappedBy = "notaFiscal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemNota> itens = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "conferencia_id")
+    @JsonIgnore
+    private Conferencia conferencia;
 
     public void addItem(ItemNota item) {
         this.itens.add(item);
